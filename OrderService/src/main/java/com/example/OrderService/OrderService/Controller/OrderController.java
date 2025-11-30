@@ -1,6 +1,7 @@
 package com.example.OrderService.OrderService.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,9 @@ public class OrderController{
     @Autowired
     private RestTemplate restTemplate;
 
+    @Value("${product.service.base-url}")
+    String productBaseUrl;
+
     @GetMapping("/{id}")
     ResponseEntity<String> getOrder(@PathVariable("id") int id){
         String product = productClient.getProductById(id);
@@ -38,9 +42,9 @@ public class OrderController{
 
     @GetMapping("/rest-template/{id}")
     ResponseEntity<String> getOrderByRestTemplate(@PathVariable("id") int id){
-        List<ServiceInstance> instances=discoveryClient.getInstances("product-service");
-        URI uri = instances.get(0).getUri();
-        String response = restTemplate.getForObject(uri+"/products/"+id, String.class);
+        //List<ServiceInstance> instances=discoveryClient.getInstances("product-service");
+        //URI uri = instances.get(0).getUri();
+        String response = restTemplate.getForObject(productBaseUrl+"/products/"+id, String.class);
         return ResponseEntity.ok().body(response);
     }
 }
